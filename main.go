@@ -19,10 +19,11 @@ func main() {
 }
 
 var (
-	usePrivate bool
-	baseURL    string
-	token      string
-	detail     bool
+	usePrivate  bool
+	baseURL     string
+	token       string
+	detail      bool
+	showVersion bool
 )
 
 func run() int {
@@ -31,7 +32,11 @@ func run() int {
 	*/
 	flag.StringVar(&baseURL, "u", "https://rubygems.org/", "base url")
 	flag.BoolVar(&detail, "d", false, "output detail")
+	flag.BoolVar(&showVersion, "v", false, "show version")
 	flag.Parse()
+	if showVersion {
+		fmt.Printf("gom v%s\n", VERSION)
+	}
 	if !detail {
 		log.SetOutput(ioutil.Discard)
 	}
