@@ -41,15 +41,15 @@ func run() int {
 	gems := flag.Args()
 	errCh := make(chan error, 1)
 	doneCh := make(chan string, 1)
-	for _, gem := range gems {
-		child := context.WithValue(ctx, request.GemNameKey, gem)
+	for _, gemName := range gems {
+		child := context.WithValue(ctx, request.GemNameKey, gemName)
 		child = context.WithValue(child, request.BaseURLKey, baseURL)
 		go func(child context.Context) {
-			info, err := request.GetGemInfo(child)
+			gem, err := request.GetGemInfo(child)
 			if err != nil {
 				errCh <- err
 			} else {
-				doneCh <- fmt.Sprintf(`add_dependency "%s", "%s"`, info.Name, info.Version)
+				doneCh <- fmt.Sprintf(`add_dependency "%s", "%s"`, gem.Name, gem.Version)
 			}
 		}(child)
 	}
