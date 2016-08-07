@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"time"
@@ -21,6 +22,7 @@ var (
 	usePrivate bool
 	baseURL    string
 	token      string
+	detail     bool
 )
 
 func run() int {
@@ -28,10 +30,15 @@ func run() int {
 		flag.BoolVar(&usePrivate, "p", false, "fetch private gem version")
 	*/
 	flag.StringVar(&baseURL, "u", "https://rubygems.org/", "base url")
+	flag.BoolVar(&detail, "d", false, "output detail")
 	flag.Parse()
+	if !detail {
+		log.SetOutput(ioutil.Discard)
+	}
 	if usePrivate {
 		config, err := newConfig()
 		if err != nil {
+			log.SetOutput(os.Stderr)
 			log.Fatal(err)
 			return 1
 		}
@@ -57,6 +64,7 @@ func run() int {
 		select {
 		case err := <-errCh:
 			if err != nil {
+				log.SetOutput(os.Stderr)
 				log.Fatal(errors.Wrap(err, "Something happened. Abort all requests."))
 				cancel()
 				return 1
