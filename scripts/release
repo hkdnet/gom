@@ -9,5 +9,17 @@ puts `git c -am "version up to #{next_version}"`
 puts `git tag v#{next_version}`
 puts `git push && git push --tags`
 
-puts `goxc -pv v#{next_version}`
+arch = %w(amd64)
+os = %w(linux darwin)
+puts `gox -arch="#{arch.join(' ')}" -os="#{os.join(' ')}" -output="dist/#{next_version}/{{.Dir}}_#{next_version}_{{.OS}}_{{.Arch}}/{{.Dir}}"`
+Dir.chdir("dist/#{next_version}") do
+  arch.each do |a|
+    os.each do |o|
+      path = "gom_#{next_version}_#{o}_#{a}/"
+      Dir.chdir(path) do
+        puts `zip ../#{path}.zip gom`
+      end
+    end
+  end
+end
 puts `ghr v#{next_version} dist/v#{next_version}`
