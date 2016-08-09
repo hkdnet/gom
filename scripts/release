@@ -11,14 +11,15 @@ puts `git push && git push --tags`
 
 arch = %w(amd64)
 os = %w(linux darwin)
-puts `gox -arch="#{arch.join(' ')}" -os="#{os.join(' ')}" -output="dist/#{next_version}/{{.Dir}}_#{next_version}_{{.OS}}_{{.Arch}}/{{.Dir}}"`
-Dir.chdir("dist/#{next_version}") do
+puts `gox -arch="#{arch.join(' ')}" -os="#{os.join(' ')}" -output="dist/v#{next_version}/{{.Dir}}_#{next_version}_{{.OS}}_{{.Arch}}/{{.Dir}}"`
+Dir.chdir("dist/v#{next_version}") do
   arch.each do |a|
     os.each do |o|
       path = "gom_#{next_version}_#{o}_#{a}/"
       Dir.chdir(path) do
         puts `zip ../#{path}.zip gom`
       end
+      puts `rm -rf #{path}`
     end
   end
 end
