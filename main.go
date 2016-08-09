@@ -22,8 +22,9 @@ var (
 	usePrivate  bool
 	baseURL     string
 	token       string
-	detail      bool
 	showVersion bool
+	detail      bool
+	dev         bool
 )
 
 func run() int {
@@ -31,7 +32,8 @@ func run() int {
 		flag.BoolVar(&usePrivate, "p", false, "fetch private gem version")
 	*/
 	flag.StringVar(&baseURL, "u", "https://rubygems.org/", "base url")
-	flag.BoolVar(&detail, "d", false, "output detail")
+	flag.BoolVar(&dev, "d", false, "output as development dependency")
+	flag.BoolVar(&detail, "detail", false, "output detail")
 	flag.BoolVar(&showVersion, "v", false, "show version")
 	flag.Parse()
 	if showVersion {
@@ -61,7 +63,11 @@ func run() int {
 			if err != nil {
 				errCh <- err
 			} else {
-				doneCh <- fmt.Sprintf(`add_dependency "%s", "%s"`, gem.Name, gem.Version)
+				if dev {
+					doneCh <- fmt.Sprintf(`spec.add_development_dependency "%s", "~>%s"`, gem.Name, gem.Version)
+				} else {
+					doneCh <- fmt.Sprintf(`spec.add_dependency "%s", "~>%s"`, gem.Name, gem.Version)
+				}
 			}
 		}(child)
 	}
